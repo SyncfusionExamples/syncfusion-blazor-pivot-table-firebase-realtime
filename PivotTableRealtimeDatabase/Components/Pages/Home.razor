@@ -1,0 +1,57 @@
+﻿@page "/"
+@using Syncfusion.Blazor.Data
+@using Syncfusion.Blazor.PivotView
+
+<SfPivotView TValue="Order" Width="1000" Height="300" ShowFieldList="true">
+    <PivotViewDataSourceSettings TValue="Order" ExpandAll="false" EnableSorting="true">
+        <SfDataManager Url="/api/Order"
+                       InsertUrl="/api/Order/Insert"
+                       UpdateUrl="/api/Order/Update"
+                       RemoveUrl="/api/Order/Delete"
+                       Adaptor="Adaptors.UrlAdaptor">
+        </SfDataManager>
+        <PivotViewColumns>
+            <PivotViewColumn Name="EmployeeID"></PivotViewColumn>
+        </PivotViewColumns>
+        <PivotViewRows>
+            <PivotViewRow Name="CustomerName"></PivotViewRow>
+        </PivotViewRows>
+        <PivotViewValues>
+            <PivotViewValue Name="Freight" Caption="Freight"></PivotViewValue>
+        </PivotViewValues>
+    </PivotViewDataSourceSettings>
+    <PivotViewGridSettings ColumnWidth="120"></PivotViewGridSettings>
+    <PivotViewEvents TValue="Order" BeginDrillThrough="BeginDrillThrough"></PivotViewEvents>
+    <PivotViewCellEditSettings AllowEditing="true"
+                               AllowAdding="true"
+                               AllowDeleting="true"
+                               Mode="EditMode.Normal">
+    </PivotViewCellEditSettings>
+</SfPivotView>
+
+@code {
+    private void BeginDrillThrough(BeginDrillThroughEventArgs args)
+    {
+        // Identify the key used by URL Adaptor update and delete requests.
+        for (int i = 0; i < args.GridObj.Columns.Count; i++)
+        {
+            if (args.GridObj.Columns[i].Field == "OrderID")
+            {
+                args.GridObj.Columns[i].IsPrimaryKey = true;
+            }
+            else
+            {
+                args.GridObj.Columns[i].Visible = true;
+            }
+        }
+    }
+
+    public class Order
+    {
+        public int? OrderID { get; set; }
+        public string? CustomerName { get; set; }
+        public int? EmployeeID { get; set; }
+        public double? Freight { get; set; }
+        public string? ShipCity { get; set; }
+    }
+}
