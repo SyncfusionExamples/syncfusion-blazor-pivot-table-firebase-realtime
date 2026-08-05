@@ -166,9 +166,10 @@ The Realtime Database sample uses the REST API directly through `HttpClient`, so
 ```json
 {
   "FirebaseSettings": {
-    "DatabaseUrl": "https://pivottablerealtimedatabase-default-rtdb.asia-southeast1.firebasedatabase.app"
+    "DatabaseUrl": "<YOUR_FIREBASE_REALTIME_DATABASE_URL>"
   }
 }
+
 ```
 
 ### Program.cs
