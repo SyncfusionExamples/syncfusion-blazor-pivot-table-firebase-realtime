@@ -3,13 +3,6 @@ using Syncfusion.Blazor;
 
 var builder = WebApplication.CreateBuilder(args);
 
-Environment.SetEnvironmentVariable(
-    "GOOGLE_APPLICATION_CREDENTIALS",
-    Path.Combine(
-        builder.Environment.ContentRootPath,
-        "Firebase",
-        "serviceAccountKey.json"));
-
 // Register the Syncfusion license before builder.Build().
 // Syncfusion packages require a valid license or trial key.
 // Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense(
