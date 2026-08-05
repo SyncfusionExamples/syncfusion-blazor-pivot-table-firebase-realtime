@@ -25,7 +25,7 @@ Sample location: https://github.com/SyncfusionExamples/syncfusion-blazor-pivot-t
 |-----------|---------|---------|
 | .NET SDK | 10.0 | Build and run the sample targeting net10.0 |
 | Visual Studio 2026 / VS Code | 18.0+ / latest | Development environment with ASP.NET and web workloads |
-| Firebase Project | Active project | Realtime Database host with a service account |
+| Firebase Project | Active project | Realtime Database host |
 | Syncfusion.Blazor.PivotTable | 34.1.33 | Pivot Table UI component |
 | Syncfusion.Blazor.Themes | 34.1.33 | Pivot Table styling |
 | Newtonsoft.Json | 13.0.4 | JSON serialization for CRUD payloads |
@@ -84,51 +84,14 @@ Add the following sample data to the `Orders` node through the Firebase console 
 
 The Realtime Database returns numeric keys as a JSON array, so the controller deserializes the response into a `List<Order?>` and filters null entries before returning the result to the Pivot Table.
 
-### 5. Generate a Firebase Service Account key
-
-Open **Project settings → Service accounts** and click **Generate new private key** to download a JSON credentials file.
-
-### 6. Place the key file in the project
-
-Rename the downloaded file to `serviceAccountKey.json` and place it at:
-
-```text
-Firebase/serviceAccountKey.json
-```
-
-## Service Account Key
-
-> **Important:** Do not commit the Firebase service account key to source control. Generate your own key from the Firebase console and store it securely.
-
-A dummy example is shown below. Replace the placeholder values with the details from your own Firebase project:
-
-```json
-{
-  "type": "service_account",
-  "project_id": "<YOUR_FIREBASE_PROJECT_ID>",
-  "private_key_id": "<PRIVATE_KEY_ID>",
-  "private_key": "-----BEGIN PRIVATE KEY-----\n<PRIVATE_KEY>\n-----END PRIVATE KEY-----\n",
-  "client_email": "<SERVICE_ACCOUNT_EMAIL>",
-  "client_id": "<CLIENT_ID>",
-  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-  "token_uri": "https://oauth2.googleapis.com/token",
-  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-  "client_x509_cert_url": "<CLIENT_X509_CERT_URL>",
-  "universe_domain": "googleapis.com"
-}
-```
-
-> The `serviceAccountKey.json` file shown here is a placeholder for demonstration only. Before running the sample, generate your own key and replace the placeholder file.
-
 ## Project Structure
 
 | File/Folder | Purpose |
 |-------------|---------|
 | /Controllers/OrderController.cs | API controller exposing read and CRUD endpoints using the Realtime Database REST API |
 | /Components/Pages/Home.razor | Pivot Table page with URL Adaptor configuration, editing, and drill-through setup |
-| /Program.cs | ASP.NET Core and Syncfusion service registration, Firebase credential setup, and middleware |
+| /Program.cs | ASP.NET Core and Syncfusion service registration, controller routing, and middleware |
 | /appsettings.json | Realtime Database URL configuration |
-| /Firebase/serviceAccountKey.json | Firebase service account key used for authentication |
 | /PivotTableRealtimeDatabase.csproj | Project file with Syncfusion packages and Newtonsoft.Json NuGet references |
 
 ## Application Flow
@@ -163,26 +126,37 @@ The Realtime Database sample uses the REST API directly through `HttpClient`, so
 
 ### appsettings.json
 
+The Realtime Database URL is read from `FirebaseSettings:DatabaseUrl` at runtime. Replace the placeholder below with the URL of your own Realtime Database (copied from **Build → Realtime Database** in the Firebase console) before running the sample:
+
 ```json
 {
   "FirebaseSettings": {
     "DatabaseUrl": "<YOUR_FIREBASE_REALTIME_DATABASE_URL>"
   }
 }
-
 ```
 
 ### Program.cs
 
-The service account key path is set as the `GOOGLE_APPLICATION_CREDENTIALS` environment variable so the Realtime Database REST API can authenticate the application:
+The application registers Syncfusion Blazor, maps controllers (including `OrderController`), and configures the standard ASP.NET Core middleware pipeline. No Firebase credentials are configured; the controller accesses the Realtime Database directly through `HttpClient`:
 
 ```csharp
-Environment.SetEnvironmentVariable(
-    "GOOGLE_APPLICATION_CREDENTIALS",
-    Path.Combine(
-        builder.Environment.ContentRootPath,
-        "Firebase",
-        "serviceAccountKey.json"));
+builder.Services.AddSyncfusionBlazor();
+builder.Services.AddRazorComponents()
+    .AddInteractiveServerComponents();
+builder.Services.AddControllers();
+builder.Services.AddProblemDetails();
+
+var app = builder.Build();
+
+app.MapControllers();
+app.UseAntiforgery();
+app.MapStaticAssets();
+
+app.MapRazorComponents<App>()
+    .AddInteractiveServerRenderMode();
+
+app.Run();
 ```
 
 ## Order Model
@@ -227,6 +201,8 @@ Each child of the `Orders` node follows the structure below. The numeric key is 
   }
 }
 ```
+
+> This sample uses numeric keys (`1`, `2`, `3`, and so on) under the `Orders` node. When sequential numeric keys are used, Firebase Realtime Database may return the data as a JSON array through the REST API. The controller implementation is designed to deserialize and process this sample structure.
 
 ## CRUD Operations
 
@@ -331,9 +307,10 @@ private void BeginDrillThrough(BeginDrillThroughEventArgs args)
 
 ## Important Notes
 
-- The service account JSON file is required for authentication with the Realtime Database.
-- Do not commit the key file to source control. Add it to `.gitignore` and provide it locally.
-- For development the database can run in **test mode**; secure the rules before deploying to production.
+- This sample accesses Firebase Realtime Database through REST API calls using `HttpClient`.
+- The sample assumes the Realtime Database is configured with development or test-access rules.
+- Update Firebase security rules appropriately before deploying to production.
+- Replace the placeholder `DatabaseUrl` with your own Realtime Database URL before running the sample.
 
 ## Getting Started
 
@@ -346,21 +323,19 @@ private void BeginDrillThrough(BeginDrillThroughEventArgs args)
    ```
 
 3. Create a Firebase project, provision a Realtime Database, and add the `Orders` node as described above.
-4. Generate a service account key and place it at `Firebase/serviceAccountKey.json`.
-5. Update `FirebaseSettings:DatabaseUrl` in `appsettings.json` with your Realtime Database URL.
-6. Run the application:
+4. Update `FirebaseSettings:DatabaseUrl` in `appsettings.json` with your Realtime Database URL.
+5. Run the application:
 
    ```bash
    dotnet run --project PivotTableRealtimeDatabase
    ```
 
-7. Open the local URL shown in the terminal and verify the Pivot Table loads and CRUD endpoints respond.
+6. Open the local URL shown in the terminal and verify the Pivot Table loads and CRUD endpoints respond.
 
 ## Troubleshooting
 
 | Issue | Possible Cause | Resolution |
 |-------|----------------|------------|
-| Missing service account key | `serviceAccountKey.json` not placed in the project | Generate a new key from the Firebase console and copy it to `Firebase/serviceAccountKey.json` |
 | Invalid `DatabaseUrl` | The URL in `appsettings.json` does not match the database | Copy the URL from **Build → Realtime Database** in the Firebase console |
 | Connection failures | Network restrictions or invalid database URL | Verify the `DatabaseUrl` is reachable and outbound HTTPS is allowed |
 | Permission issues | Security rules block read or write access | Update the database rules or test in development with **test mode** |
