@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-This repository demonstrates how to bind Firebase Realtime Database data to the Syncfusion Blazor Pivot Table through an ASP.NET Core API and the URL Adaptor. The sample calls the Realtime Database REST API with `HttpClient` to load and persist documents under an `Orders` node, while the Pivot Table consumes the API through `SfDataManager`.
+This repository demonstrates how to bind Firebase Realtime Database data to the Syncfusion [Blazor Pivot Table](https://www.syncfusion.com/blazor-components/blazor-pivot-table) through an ASP.NET Core API and the URL Adaptor. The sample calls the Realtime Database REST API with `HttpClient` to load and persist documents under an `Orders` node, while the Pivot Table consumes the API through `SfDataManager`.
 
 The server handles Realtime Database access, JSON serialization, and CRUD operations, keeping the Pivot Table focused on aggregation and editing.
 
@@ -346,8 +346,17 @@ private void BeginDrillThrough(BeginDrillThroughEventArgs args)
 
 ## Full Documentation
 
-For the complete step-by-step guide, including URL Adaptor configuration, CRUD mappings, and Firebase Realtime Database connection setup, see the official Syncfusion Blazor Pivot Table documentation.
+For the complete step-by-step guide, including URL Adaptor configuration, CRUD mappings, and Firebase Realtime Database connection setup, see the official Syncfusion Blazor Pivot Table documentation: https://help.syncfusion.com/grid-sdk/blazor/pivot-table/connecting-to-data-source/firebase-realtime
 
 ## Summary
 
 This sample demonstrates how to bind Firebase Realtime Database data to the Syncfusion Blazor Pivot Table through an ASP.NET Core API and the URL Adaptor. The controller uses `HttpClient` to read, insert, update, and delete orders under the `Orders` node through the Realtime Database REST API, while the Pivot Table performs aggregation and editing on the client. The same-origin relative URLs and primary key configuration keep the remote binding simple and secure, and the `[JsonPropertyName]` attributes map the camel-cased Realtime Database fields to .NET properties for clean CRUD handling.
+
+## Support and Feedback
+
+- For general product questions, visit the [Syncfusion Community Forum](https://www.syncfusion.com/forums) or [Syncfusion Support](https://www.syncfusion.com/support).
+- To report an issue specific to this sample, open a GitHub issue in this repository.
+
+## License
+
+This is a Syncfusion sample project provided to demonstrate product usage. Review the [Syncfusion license terms](https://www.syncfusion.com/sales/pricing?category=ui-components) before using Syncfusion components in your own applications.
